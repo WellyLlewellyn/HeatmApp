@@ -17,6 +17,7 @@ library(shinydashboard)
 library(tidyverse)
 library(shiny)
 library(DT)
+library(plotly)
 
 
 

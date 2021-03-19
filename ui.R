@@ -124,7 +124,7 @@ ui <- dashboardPagePlus(skin = "green",
                                             
                                             # Show a plot of the generated distribution
                                             mainPanel(
-                                                plotOutput("distPlot")
+                                                plotOutput("distPlot",width = '100%',height = "800px")
                                             )
                                         )
                                         )

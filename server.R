@@ -68,7 +68,7 @@ shinyServer(function(input, output) {
     output$CompHeatPackageFilter <- renderUI(pickerInput(inputId = "CompHeatmapPkgFil",label = "Select Packages",inline = TRUE,choices = as.list(sort(unique(MainData()$Package))),
                                                  selected = as.list(unique(MainData()$Package)),multiple = TRUE,options = list(`actions-box` = TRUE,size = 10,`selected-text-format` = "count > 3" )))
     
-    output$CompHeatComponentFilter <- renderUI(pickerInput(inputId = "CompHeatmapLocFil",label = "Select Packages",inline = TRUE,choices = as.list(sort(unique(MainData()$Location))),
+    output$CompHeatComponentFilter <- renderUI(pickerInput(inputId = "CompHeatmapLocFil",label = "Select Locations",inline = TRUE,choices = as.list(sort(unique(MainData()$Location))),
                                                   selected = as.list(unique(MainData()$Location)),multiple = TRUE,options = list(`actions-box` = TRUE,size = 10,`selected-text-format` = "count > 3" )))
     
     output$CompHeatFeatueFilter <- renderUI(pickerInput(inputId = "CompHeatmapFeatureFil",label = "Select Features/Pins",inline = TRUE,choices = as.list(sort(unique(MainData()$Feature))),
@@ -87,7 +87,7 @@ shinyServer(function(input, output) {
    
     CompHeatmapData <- reactive({
     Result <- CompHeatmapDataFiltered()%>%group_by(Location)%>%
-        dplyr::summarise("PosX(mm)"=mean(`PosX(mm)`),"PosY(mm)"=mean(`PosY(mm)`),"Package"=mean(Package),count =n())
+        dplyr::summarise("Package"=paste(unique(Package), collapse = ', '),"PosX(mm)"=mean(`PosX(mm)`),"PosY(mm)"=mean(`PosY(mm)`),"OffsetX"=mean(OffsetX),"OffsetY"=mean(OffsetY),count =n())
     return(Result)
     })
     output$CompHeatmapDataFilteredDT <- renderDT(CompHeatmapDataFiltered())
@@ -96,7 +96,7 @@ shinyServer(function(input, output) {
     output$CompHeatmapPlotly <- renderPlotly(ggplotly(
         ggplot(data = CompHeatmapData(),
                mapping = aes(x = `PosX(mm)`,y = `PosY(mm)`, label = `Location`)) + 
-               geom_text(aes(color=factor(`Package`)),size=4,check_overlap = TRUE)))
+               geom_text(aes(color=factor(sort(`Package`))),size=4,check_overlap = TRUE)))
     
     
     
