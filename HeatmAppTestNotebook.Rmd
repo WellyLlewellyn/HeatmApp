@@ -1,0 +1,94 @@
+---
+title: "HeatmApp Test Notebook"
+output: html_notebook
+---
+
+```{r Libraries}
+
+library(tidyverse)
+library(shinydashboardPlus)
+library(shinydashboard)
+library(plotly)
+
+```
+
+```{r Load Functions}
+
+sourceDirectory <- function(pathToFolder=paste(getwd(),"/R/",sep = "")){
+  for (x in list.files(pathToFolder)){
+    source(file.path(pathToFolder, x))}}
+
+if(xfun::dir_exists("R")==TRUE){
+  sourceDirectory()
+  print(".R directory found and sourced")
+}else{
+  print("No .R directory found")}
+```
+
+```{r Load Data, echo=FALSE, message=FALSE, error=TRUE, warning=FALSE}
+
+#CSVlist <- as.list(dir("resources/TestData"))
+
+#lensStandardOutput <- read_csv("resources/TestData/lensStandardOutput.csv")
+
+LensSQL_file1 <- read_csv("resources/TestData/Run1_LensSQL.csv")
+LensSQL_file2 <- read_csv("resources/TestData/SQL2399-400blistre2.csv")
+
+CyberAdv_file1 <- read_csv("resources/TestData/Run2_AdvancedCyber.csv",col_types = cols(PanelId = col_number()))
+```
+
+```{r Process Data}
+Lens1 <- advancedLensPrep(Data = LensSQL_file1 , ComponentSplit = "Group")
+Lens2 <- advancedLensPrep(Data = LensSQL_file2 , ComponentSplit = "Group")
+
+Cyber1 <- advancedCyberPrep(Data = CyberAdv_file1 , ComponentSplit = "Package")
+```
+
+```{r}
+data_frame("A" = c(0,0,0,0,1,0,6) ,"B" = c(0,0,0,1,0,5,0), "C" = c(0,0,1,0,4,0,15),
+                                      "D" = c(0,1,0,3,0,10,0),"E" = c(1,0,2,0,6,0,20),"F" = c(0,1,0,3,0,10,0),
+                                      "G" = c(0,0,1,0,4,0,15),"H" = c(0,0,0,1,0,5,0), "I" = c(0,0,0,0,1,0,6))
+```
+
+```{r}
+Lens1GroupSubset <- Lens1 %>% filter(Package %in% list(4,5,6))
+Lens1GrpSubCompSumm <- Lens1GroupSubset%>%group_by(Location)%>%
+    dplyr::summarise("PosX(mm)"=mean(`PosX(mm)`),"PosY(mm)"=mean(`PosY(mm)`),"Package"=mean(Package),count =n())
+```
+
+```{r}
+Graph <- ggplot(data = Lens1GrpSubCompSumm, mapping = aes(x = `PosX(mm)`,y = `PosY(mm)`, label = `Location`)) + 
+  #geom_point() + 
+  geom_text(aes(color=factor(`Package`)),size=4,check_overlap = TRUE)
+#Graph
+ggplotly(Graph)
+```
+
+```{r}
+testList <- as.list(sort(unique(Lens1$Package)))
+
+```
+
+```{r}
+
+```
+
+```{r}
+
+```
+
+```{r}
+
+```
+
+```{r}
+
+```
+
+```{r}
+
+```
+
+```{r}
+
+```
