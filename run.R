@@ -14,10 +14,12 @@ if(xfun::dir_exists("R")==TRUE){
 
 library(shinydashboardPlus)
 library(shinydashboard)
+library(shinyWidgets)
 library(tidyverse)
 library(shiny)
 library(DT)
 library(plotly)
+library(ggplot2)
 
 
 

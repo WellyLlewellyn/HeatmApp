@@ -81,7 +81,7 @@ ui <- dashboardPagePlus(skin = "green",
                                                 column(3,uiOutput('CompHeatBrdFilter'))
                                             ),
                                             fluidRow(
-                                                plotlyOutput("CompHeatmapPlotly")
+                                                plotlyOutput("CompHeatmapPlotly",height = paste0(dev.size("px")[2],"px"))
                                                 ),
                                                 
                                             fluidRow(
@@ -94,40 +94,167 @@ ui <- dashboardPagePlus(skin = "green",
                                         ),
 
 # Overall Heatmap ---------------------------------------------------------
-                                tabItem(tabName = "OverallHeatmap",h4("Overall HM")),
+                                tabItem(tabName = "OverallHeatmap",
+                                        h4("Overall HM"),
+                                        fluidPage(
+                                            fluidRow(
+                                                tabsetPanel(
+                                                    tabPanel("Metrics&Values",
+                                                column(3,
+                                                       uiOutput('overallBoardChoice'),
+                                                       uiOutput('OverallGrouping'),
+                                                       uiOutput('OverallXOutput'),
+                                                       uiOutput('OverallYOutput'),
+                                                       uiOutput('OverallZOutput')
+                                                       ),
+                                                column(3,
+                                                       numericInput(inputId = "OverallLowerBound",label = "Lower Bound",value = 40,step = 1),
+                                                       numericInput(inputId = "OverallUpperBound",label = "Upper Bound",value = 160,step = 1),
+                                                       selectInput(inputId = "OverallMetric",label = "Metric for use",choices = list("Mean","Median","Min","Max","","IQR","StdDev","Variance","Mad"),selected = "Mean",multiple = FALSE,width = '100%'),
+                                                       numericInput(inputId = "OverallHeight",label = "Graph Height",value = 900,step = 1),
+                                                       numericInput(inputId = "OverallWidth",label = "Graph Width",value = 950,step = 1)
+                                                       ),
+                                                column(3,
+                                                       colorPickr(inputId = "OverallColourLower1",label = "Minimum Bound Colour",selected = "#6A5ACD"),
+                                                       colorPickr(inputId = "OverallColourLower2",label = "Lower Tansition Colour",selected = "#28D8C8"),
+                                                       colorPickr(inputId = "OverallColourAverage",label = "Average Colour",selected = "#2AFF60"),
+                                                       colorPickr(inputId = "OverallColourUpper2",label = "Upper Transition Colour",selected = "#DBE95D"),
+                                                       colorPickr(inputId = "OverallColourUpper1",label = "Maximum Bound Colour",selected = "#E5FF00")
+                                                       ),
+                                                column(3
+                                                ),
+                                                actionBttn(inputId = "OverallActionButton",label = "Update Heatmap",icon = "cat",style = "pill",block = TRUE)),
+                                                
+                                                tabPanel("DataTable",DTOutput("OverallHeatmapDT")))),
+                                        hr(),
+                                            fluidRow(
+                                                uiOutput('OverallHeatmapUI')
+                                            )
+                                            
+                                        )
+                                        ),
 
 # Singular Heatmap ---------------------------------------------------------
-                                tabItem(tabName = "SingularHeatmap",h4("Singular HM")),
+                                tabItem(tabName = "SingularHeatmap",h4("Singular HM"),
+                                        fluidPage(
+                                            fluidRow(
+                                                tabsetPanel(
+                                                    tabPanel("Metrics&Values",
+                                                             column(3,
+                                                                    uiOutput('singleBoardChoice'),
+                                                                    uiOutput('singleGrouping'),
+                                                                    uiOutput('singleXOutput'),
+                                                                    uiOutput('singleYOutput'),
+                                                                    uiOutput('singleZOutput')
+                                                             ),
+                                                             column(3,
+                                                                    numericInput(inputId = "singleLowerBound",label = "Lower Bound",value = 40,step = 1),
+                                                                    numericInput(inputId = "singleUpperBound",label = "Upper Bound",value = 160,step = 1),
+                                                                    selectInput(inputId = "singleMetric",label = "Metric for use",choices = list("Mean","Median","Min","Max","IQR","StdDev","Variance","Mad"),selected = "Mean",multiple = FALSE,width = '100%'),
+                                                                    numericInput(inputId = "singleHeight",label = "Graph Height",value = 900,step = 1),
+                                                                    numericInput(inputId = "singleWidth",label = "Graph Width",value = 950,step = 1)
+                                                             ),
+                                                             column(3,
+                                                                    colorPickr(inputId = "singleColourLower1",label = "Minimum Bound Colour",selected = "#6A5ACD"),
+                                                                    colorPickr(inputId = "singleColourLower2",label = "Lower Tansition Colour",selected = "#28D8C8"),
+                                                                    colorPickr(inputId = "singleColourAverage",label = "Average Colour",selected = "#2AFF60"),
+                                                                    colorPickr(inputId = "singleColourUpper2",label = "Upper Transition Colour",selected = "#DBE95D"),
+                                                                    colorPickr(inputId = "singleColourUpper1",label = "Maximum Bound Colour",selected = "#E5FF00")
+                                                             ),
+                                                             column(3
+                                                             ),
+                                                             actionBttn(inputId = "singleActionButton",label = "Update Heatmap",icon = "cat",style = "pill",block = TRUE)),
+                                                    
+                                                    tabPanel("DataTable",DTOutput("singleHeatmapDT")))),
+                                            hr(),
+                                            fluidRow(
+                                                #uiOutput('singleHeatmapUI')
+                                            )
+                                            
+                                        )),
 
 # Print Direction Heatmap ---------------------------------------------------------
-                                tabItem(tabName = "PrintDirectionHeatmap",h4("Print Dir HM")),
+                                tabItem(tabName = "PrintDirectionHeatmap",h4("Print Dir HM"),
+                                        fluidPage(
+                                            fluidRow(
+                                                tabsetPanel(
+                                                    tabPanel("Metrics&Values",
+                                                             column(3,
+                                                                    uiOutput('PrintDirGrouping'),
+                                                                    uiOutput('PrintDirXOutput'),
+                                                                    uiOutput('PrintDirYOutput'),
+                                                                    uiOutput('PrintDirZOutput')
+                                                             ),
+                                                             column(3,
+                                                                    numericInput(inputId = "PrintDirLowerBound",label = "Lower Bound",value = 40,step = 1),
+                                                                    numericInput(inputId = "PrintDirUpperBound",label = "Upper Bound",value = 160,step = 1),
+                                                                    selectInput(inputId = "PrintDirMetric",label = "Metric for use",choices = list("Mean","Median","Min","Max","","IQR","StdDev","Variance","Mad"),selected = "Mean",multiple = FALSE,width = '100%'),
+                                                                    numericInput(inputId = "PrintDirHeight",label = "Graph Height",value = 900,step = 1),
+                                                                    numericInput(inputId = "PrintDirWidth",label = "Graph Width",value = 950,step = 1)
+                                                             ),
+                                                             column(3,
+                                                                    colorPickr(inputId = "PrintDirColourLower1",label = "Minimum Bound Colour",selected = "#6A5ACD"),
+                                                                    colorPickr(inputId = "PrintDirColourLower2",label = "Lower Tansition Colour",selected = "#28D8C8"),
+                                                                    colorPickr(inputId = "PrintDirColourAverage",label = "Average Colour",selected = "#2AFF60"),
+                                                                    colorPickr(inputId = "PrintDirColourUpper2",label = "Upper Transition Colour",selected = "#DBE95D"),
+                                                                    colorPickr(inputId = "PrintDirColourUpper1",label = "Maximum Bound Colour",selected = "#E5FF00")
+                                                             ),
+                                                             column(3
+                                                             ),
+                                                             actionBttn(inputId = "PrintDirActionButton",label = "Update Heatmap",icon = "cat",style = "pill",block = TRUE)),
+                                                    
+                                                    tabPanel("DataTable",DTOutput("PrintDirHeatmapDT")))),
+                                            hr(),
+                                            fluidRow(
+                                                uiOutput('PrintDirHeatmapUI')
+                                            )
+                                            
+                                        )),
 
 # Cleaning Period Heatmap ---------------------------------------------------------
-                                tabItem(tabName = "CleaningPeriodHeatmap",h4("Cleaning Period HM")),
+                                tabItem(tabName = "CleaningPeriodHeatmap",h4("Cleaning Period HM"),
+                                        fluidPage(
+                                            fluidRow(
+                                                tabsetPanel(
+                                                    tabPanel("Metrics&Values",
+                                                             column(3
+                                                                    
+                                                             ),
+                                                             column(3,
+                                                                    uiOutput('CleanPerGrouping'),
+                                                                    uiOutput('CleanPerXOutput'),
+                                                                    uiOutput('CleanPerYOutput'),
+                                                                    uiOutput('CleanPerZOutput')
+                                                             ),
+                                                             column(3,
+                                                                    numericInput(inputId = "CleanPerLowerBound",label = "Lower Bound",value = 40,step = 1),
+                                                                    numericInput(inputId = "CleanPerUpperBound",label = "Upper Bound",value = 160,step = 1),
+                                                                    selectInput(inputId = "CleanPerMetric",label = "Metric for use",choices = list("Mean","Median","Min","Max","","IQR","StdDev","Variance","Mad"),selected = "Mean",multiple = FALSE,width = '100%'),
+                                                                    numericInput(inputId = "CleanPerHeight",label = "Graph Height",value = 900,step = 1),
+                                                                    numericInput(inputId = "CleanPerWidth",label = "Graph Width",value = 950,step = 1)
+                                                             ),
+                                                             column(3,
+                                                                    colorPickr(inputId = "CleanPerColourLower1",label = "Minimum Bound Colour",selected = "#6A5ACD"),
+                                                                    colorPickr(inputId = "CleanPerColourLower2",label = "Lower Tansition Colour",selected = "#28D8C8"),
+                                                                    colorPickr(inputId = "CleanPerColourAverage",label = "Average Colour",selected = "#2AFF60"),
+                                                                    colorPickr(inputId = "CleanPerColourUpper2",label = "Upper Transition Colour",selected = "#DBE95D"),
+                                                                    colorPickr(inputId = "CleanPerColourUpper1",label = "Maximum Bound Colour",selected = "#E5FF00")
+                                                             ),
+                                                             
+                                                             actionBttn(inputId = "CleanPerActionButton",label = "Update Heatmap",icon = "cat",style = "pill",block = TRUE)),
+                                                    
+                                                    tabPanel("DataTable",DTOutput("CleanPerHeatmapDT")))),
+                                            hr(),
+                                            fluidRow(
+                                                uiOutput('CleanPerHeatmapUI')
+                                            )
+                                            
+                                        )),
 
 # Spare Heatmap -------------------------------------------------------
                                 
 # Shiny Default ----------------------------------------------------------
-                                tabItem(tabName = "ShinyDefault",
-                                        # Application title
-                                        titlePanel("Old Faithful Geyser Data"),
-                                        
-                                        # Sidebar with a slider input for number of bins
-                                        sidebarLayout(
-                                            sidebarPanel(
-                                                sliderInput("bins",
-                                                            "Number of bins:",
-                                                            min = 1,
-                                                            max = 50,
-                                                            value = 30)
-                                            ),
-                                            
-                                            # Show a plot of the generated distribution
-                                            mainPanel(
-                                                plotOutput("distPlot",width = '100%',height = "800px")
-                                            )
-                                        )
-                                        )
+                                tabItem(tabName = "ShinyDefault")
                             )
                         )
                         

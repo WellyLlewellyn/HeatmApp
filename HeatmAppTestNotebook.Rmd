@@ -52,7 +52,7 @@ data_frame("A" = c(0,0,0,0,1,0,6) ,"B" = c(0,0,0,1,0,5,0), "C" = c(0,0,1,0,4,0,1
 
 ```{r}
 Lens1GroupSubset <- Lens1 %>% filter(Package %in% list(4,5,6))
-Lens1GrpSubCompSumm <- Lens1GroupSubset%>%group_by(Location)%>%
+Lens1GrpSubCompSumm <- Lens1GroupSubset%>%group_by(Location,BoardNo)%>%
     dplyr::summarise("PosX(mm)"=mean(`PosX(mm)`),"PosY(mm)"=mean(`PosY(mm)`),"Package"=mean(Package),count =n())
 ```
 
