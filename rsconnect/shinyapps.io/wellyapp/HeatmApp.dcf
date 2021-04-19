@@ -1,0 +1,12 @@
+name: HeatmApp
+title: HeatmApp
+username:
+account: wellyapp
+server: shinyapps.io
+hostUrl: https://api.shinyapps.io/v1
+appId: 3962866
+bundleId: 4470157
+url: https://wellyapp.shinyapps.io/HeatmApp/
+when: 1618402422.2779
+asMultiple: FALSE
+asStatic: FALSE

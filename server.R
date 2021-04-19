@@ -1,16 +1,3 @@
-# Libraries ---------------------------------------------------------------
-
-sourceDirectory()
-library(shiny)
-library(shinyWidgets)
-library(shinydashboardPlus)
-library(shinydashboard)
-library(tidyverse)
-library(DT)
-library(plotly)
-
-
-
 # Server Logic ------------------------------------------------------------
 
 shinyServer(function(input, output) {
@@ -216,8 +203,15 @@ shinyServer(function(input, output) {
         as.list(colnames(MainData()))
     })
      # Overall Heatmaps --------------------------------------------------------
-    output$overallBoardChoice <- renderUI(pickerInput(inputId = "overallBoardChoiceBoards",label = "Select Boards",choices = boardList(),
-                                                      selected = boardList(),multiple = TRUE,options = list(`actions-box` = TRUE,size = 10,`selected-text-format` = "count > 3")))
+    output$overallBoardChoice <- renderUI(pickerInput(
+        inputId = "overallBoardChoiceBoards",label = "Select Boards",choices = boardList(),selected = boardList(),multiple = TRUE,
+        options = list(`actions-box` = TRUE,size = 10,`selected-text-format` = "count > 3")))
+    
+    overallData <- reactive({
+        Result <- MainData() %>% filter(BoardNo %in% input$overallBoardChoiceBoards)
+        
+        return(Result)
+    })
     
     
      output$OverallGrouping <- renderUI(selectInput(inputId = "OverallGroupingInput",label = "Select Grouping",choices = zVariableList(),selected = "PadID"))
@@ -226,15 +220,15 @@ shinyServer(function(input, output) {
      output$OverallZOutput  <- renderUI(selectInput(inputId = "OverallZInput",label = "Select Z Choice",choices = zVariableList(),selected = "VolumePerc"))
     
     OverallHeatmapData <- reactive({
-        if     (input$OverallMetric=="Mean"){Result <- MainData() %>% group_by(get(input$OverallGroupingInput))     %>% dplyr::summarise("Metric" = round(mean(get(input$OverallZInput)),3),"PosX(mm)" = round(mean(`PosX(mm)`), 7),"PosY(mm)" = round(mean(`PosY(mm)`), 7))}
-        else if(input$OverallMetric=="Median"){Result <- MainData() %>% group_by(get(input$OverallGroupingInput))   %>% dplyr::summarise("Metric" = round(median(get(input$OverallZInput)),3),"PosX(mm)" = round(mean(`PosX(mm)`), 7),"PosY(mm)" = round(mean(`PosY(mm)`), 7))}
-        else if(input$OverallMetric=="Min"){Result <- MainData() %>% group_by(get(input$OverallGroupingInput))      %>% dplyr::summarise("Metric" = round(min(get(input$OverallZInput)),3),"PosX(mm)" = round(mean(`PosX(mm)`), 7),"PosY(mm)" = round(mean(`PosY(mm)`), 7))}
-        else if(input$OverallMetric=="Max"){Result <- MainData() %>% group_by(get(input$OverallGroupingInput))      %>% dplyr::summarise("Metric" = round(max(get(input$OverallZInput)),3),"PosX(mm)" = round(mean(`PosX(mm)`), 7),"PosY(mm)" = round(mean(`PosY(mm)`), 7))}
-        else if(input$OverallMetric=="IQR"){Result <- MainData() %>% group_by(get(input$OverallGroupingInput))      %>% dplyr::summarise("Metric" = round(IQR(get(input$OverallZInput)),3),"PosX(mm)" = round(mean(`PosX(mm)`), 7),"PosY(mm)" = round(mean(`PosY(mm)`), 7))}
-        else if(input$OverallMetric=="StdDev"){Result <- MainData() %>% group_by(get(input$OverallGroupingInput))   %>% dplyr::summarise("Metric" = round(sd(get(input$OverallZInput)),3),"PosX(mm)" = round(mean(`PosX(mm)`), 7),"PosY(mm)" = round(mean(`PosY(mm)`), 7))}
-        else if(input$OverallMetric=="Variance"){Result <- MainData() %>% group_by(get(input$OverallGroupingInput)) %>% dplyr::summarise("Metric" = round(var(get(input$OverallZInput)),3),"PosX(mm)" = round(mean(`PosX(mm)`), 7),"PosY(mm)" = round(mean(`PosY(mm)`), 7))}
-        else if(input$OverallMetric=="Mad"){Result <- MainData() %>% group_by(get(input$OverallGroupingInput))      %>% dplyr::summarise("Metric" = round(mad(get(input$OverallZInput)),3),"PosX(mm)" = round(mean(`PosX(mm)`), 7),"PosY(mm)" = round(mean(`PosY(mm)`), 7))}
-        else (Result <- MainData() %>% group_by(get(input$OverallGroupingInput))                                    %>% dplyr::summarise("Metric" = round(mean(get(input$OverallZInput)),3),"PosX(mm)" = round(mean(`PosX(mm)`), 7),"PosY(mm)" = round(mean(`PosY(mm)`), 7)))
+        if     (input$OverallMetric=="Mean"){Result <- overallData() %>% group_by(get(input$OverallGroupingInput))     %>% dplyr::summarise("Metric" = round(mean(get(input$OverallZInput)),3),"PosX(mm)" = round(mean(`PosX(mm)`), 7),"PosY(mm)" = round(mean(`PosY(mm)`), 7))}
+        else if(input$OverallMetric=="Median"){Result <- overallData() %>% group_by(get(input$OverallGroupingInput))   %>% dplyr::summarise("Metric" = round(median(get(input$OverallZInput)),3),"PosX(mm)" = round(mean(`PosX(mm)`), 7),"PosY(mm)" = round(mean(`PosY(mm)`), 7))}
+        else if(input$OverallMetric=="Min"){Result <- overallData() %>% group_by(get(input$OverallGroupingInput))      %>% dplyr::summarise("Metric" = round(min(get(input$OverallZInput)),3),"PosX(mm)" = round(mean(`PosX(mm)`), 7),"PosY(mm)" = round(mean(`PosY(mm)`), 7))}
+        else if(input$OverallMetric=="Max"){Result <- overallData() %>% group_by(get(input$OverallGroupingInput))      %>% dplyr::summarise("Metric" = round(max(get(input$OverallZInput)),3),"PosX(mm)" = round(mean(`PosX(mm)`), 7),"PosY(mm)" = round(mean(`PosY(mm)`), 7))}
+        else if(input$OverallMetric=="IQR"){Result <- overallData() %>% group_by(get(input$OverallGroupingInput))      %>% dplyr::summarise("Metric" = round(IQR(get(input$OverallZInput)),3),"PosX(mm)" = round(mean(`PosX(mm)`), 7),"PosY(mm)" = round(mean(`PosY(mm)`), 7))}
+        else if(input$OverallMetric=="StdDev"){Result <- overallData() %>% group_by(get(input$OverallGroupingInput))   %>% dplyr::summarise("Metric" = round(sd(get(input$OverallZInput)),3),"PosX(mm)" = round(mean(`PosX(mm)`), 7),"PosY(mm)" = round(mean(`PosY(mm)`), 7))}
+        else if(input$OverallMetric=="Variance"){Result <- overallData() %>% group_by(get(input$OverallGroupingInput)) %>% dplyr::summarise("Metric" = round(var(get(input$OverallZInput)),3),"PosX(mm)" = round(mean(`PosX(mm)`), 7),"PosY(mm)" = round(mean(`PosY(mm)`), 7))}
+        else if(input$OverallMetric=="Mad"){Result <- overallData() %>% group_by(get(input$OverallGroupingInput))      %>% dplyr::summarise("Metric" = round(mad(get(input$OverallZInput)),3),"PosX(mm)" = round(mean(`PosX(mm)`), 7),"PosY(mm)" = round(mean(`PosY(mm)`), 7))}
+        else (Result <- overallData() %>% group_by(get(input$OverallGroupingInput))                                    %>% dplyr::summarise("Metric" = round(mean(get(input$OverallZInput)),3),"PosX(mm)" = round(mean(`PosX(mm)`), 7),"PosY(mm)" = round(mean(`PosY(mm)`), 7)))
     })
     output$OverallHeatmapDT <- renderDT(OverallHeatmapData())
     
@@ -282,31 +276,40 @@ shinyServer(function(input, output) {
     output$singleYOutput <-renderUI(selectInput(inputId = "singleYInput",label = "Select Y Choice",choices = xyVariableList,selected = "PosY(mm)"))
     output$singleZOutput <-renderUI(selectInput(inputId = "singleZInput",label = "Select Z Choice",choices = zVariableList(),selected = "VolumePerc"))
     
+    singleData <- reactive({
+        
+        Result <- MainData() %>% filter(BoardNo %in% input$singleBoards)
+        Result$groupby1 <- Result[['BoardNo']]
+        Result$groupby2 <- Result[[input$singleGroupingInput]]
+    return(Result)
+})
+    
     singleHeatmapData <- reactive({
-        if     (input$singleMetric=="Mean"){Result <- MainData()  %>% group_by(BoardNo, get(input$singleGroupingInput))   %>% dplyr::summarise("Metric" = round(mean(get(input$OverallZInput)),3),"PosX(mm)" = round(mean(`PosX(mm)`), 7),"PosY(mm)" = round(mean(`PosY(mm)`), 7))}
-        else if(input$singleMetric=="Median"){Result <- MainData() %>%  group_by(BoardNo,get(input$singleGroupingInput))   %>% dplyr::summarise("Metric" = round(median(get(input$OverallZInput)),3),"PosX(mm)" = round(mean(`PosX(mm)`), 7),"PosY(mm)" = round(mean(`PosY(mm)`), 7))}
-        else if(input$singleMetric=="Min"){Result <- MainData() %>% group_by(BoardNo,get(input$singleGroupingInput))      %>% dplyr::summarise("Metric" = round(min(get(input$OverallZInput)),3),"PosX(mm)" = round(mean(`PosX(mm)`), 7),"PosY(mm)" = round(mean(`PosY(mm)`), 7))}
-        else if(input$singleMetric=="Max"){Result <- MainData() %>% group_by(get(input$singleGroupingInput))      %>% dplyr::summarise("Metric" = round(max(get(input$OverallZInput)),3),"PosX(mm)" = round(mean(`PosX(mm)`), 7),"PosY(mm)" = round(mean(`PosY(mm)`), 7))}
-        else if(input$singleMetric=="IQR"){Result <- MainData() %>% group_by(get(input$singleGroupingInput))      %>% dplyr::summarise("Metric" = round(IQR(get(input$OverallZInput)),3),"PosX(mm)" = round(mean(`PosX(mm)`), 7),"PosY(mm)" = round(mean(`PosY(mm)`), 7))}
-        else if(input$singleMetric=="StdDev"){Result <- MainData() %>% group_by(get(input$singleGroupingInput))   %>% dplyr::summarise("Metric" = round(sd(get(input$OverallZInput)),3),"PosX(mm)" = round(mean(`PosX(mm)`), 7),"PosY(mm)" = round(mean(`PosY(mm)`), 7))}
-        else if(input$singleMetric=="Variance"){Result <- MainData() %>% group_by(get(input$singleGroupingInput)) %>% dplyr::summarise("Metric" = round(var(get(input$OverallZInput)),3),"PosX(mm)" = round(mean(`PosX(mm)`), 7),"PosY(mm)" = round(mean(`PosY(mm)`), 7))}
-        else if(input$singleMetric=="Mad"){Result <- MainData() %>% group_by(get(input$singleGroupingInput))      %>% dplyr::summarise("Metric" = round(mad(get(input$OverallZInput)),3),"PosX(mm)" = round(mean(`PosX(mm)`), 7),"PosY(mm)" = round(mean(`PosY(mm)`), 7))}
-        else (Result <- MainData() %>% group_by(get(input$singleGroupingInput)) %>% dplyr::summarise("Metric" = round(mean(get(input$OverallZInput)),3),"PosX(mm)" = round(mean(`PosX(mm)`), 7),"PosY(mm)" = round(mean(`PosY(mm)`), 7)))                                  
+        if     (input$singleMetric=="Mean"){Result <- singleData()  %>% group_by(groupby1,groupby2)   %>% dplyr::summarise("Metric" = round(mean(get(input$singleZInput)),3),"PosX(mm)" = round(mean(`PosX(mm)`), 7),"PosY(mm)" = round(mean(`PosY(mm)`), 7))}
+        else if(input$singleMetric=="Median"){Result <- singleData() %>%  group_by(BoardNo,get(input$singleGroupingInput))   %>% dplyr::summarise("Metric" = round(median(get(input$singleZInput)),3),"PosX(mm)" = round(mean(`PosX(mm)`), 7),"PosY(mm)" = round(mean(`PosY(mm)`), 7))}
+        else if(input$singleMetric=="Min"){Result <- singleData() %>% group_by(BoardNo,get(input$singleGroupingInput))      %>% dplyr::summarise("Metric" = round(min(get(input$singleZInput)),3),"PosX(mm)" = round(mean(`PosX(mm)`), 7),"PosY(mm)" = round(mean(`PosY(mm)`), 7))}
+        else if(input$singleMetric=="Max"){Result <- singleData() %>% group_by(get(input$singleGroupingInput))      %>% dplyr::summarise("Metric" = round(max(get(input$singleZInput)),3),"PosX(mm)" = round(mean(`PosX(mm)`), 7),"PosY(mm)" = round(mean(`PosY(mm)`), 7))}
+        else if(input$singleMetric=="IQR"){Result <- singleData() %>% group_by(get(input$singleGroupingInput))      %>% dplyr::summarise("Metric" = round(IQR(get(input$singleZInput)),3),"PosX(mm)" = round(mean(`PosX(mm)`), 7),"PosY(mm)" = round(mean(`PosY(mm)`), 7))}
+        else if(input$singleMetric=="StdDev"){Result <- singleData() %>% group_by(get(input$singleGroupingInput))   %>% dplyr::summarise("Metric" = round(sd(get(input$singleZInput)),3),"PosX(mm)" = round(mean(`PosX(mm)`), 7),"PosY(mm)" = round(mean(`PosY(mm)`), 7))}
+        else if(input$singleMetric=="Variance"){Result <- singleData() %>% group_by(get(input$singleGroupingInput)) %>% dplyr::summarise("Metric" = round(var(get(input$singleZInput)),3),"PosX(mm)" = round(mean(`PosX(mm)`), 7),"PosY(mm)" = round(mean(`PosY(mm)`), 7))}
+        else if(input$singleMetric=="Mad"){Result <- singleData() %>% group_by(get(input$singleGroupingInput))      %>% dplyr::summarise("Metric" = round(mad(get(input$singleZInput)),3),"PosX(mm)" = round(mean(`PosX(mm)`), 7),"PosY(mm)" = round(mean(`PosY(mm)`), 7))}
+        else (Result <- singleData() %>% group_by(get(input$singleGroupingInput)) %>% dplyr::summarise("Metric" = round(mean(get(input$singleZInput)),3),"PosX(mm)" = round(mean(`PosX(mm)`), 7),"PosY(mm)" = round(mean(`PosY(mm)`), 7)))                                  
     }) 
     
     output$singleHeatmapDT <- renderDT(singleHeatmapData())
     output$singleHeatmapPlotly <- renderPlotly({
             input$singleActionButton
-            isolate(ggplotly(
+            isolate(
+                ggplotly(
                 ggplot(
-                    data = OverallHeatmapData(),
+                    data = singleHeatmapData(),
                     mapping = aes(
                         x = get(input$singleXInput),
                         y = get(input$singleYInput)
                     )
                 ) +
                     geom_point(aes(color = Metric)) +
-                    facet_wrap('BoardNo') + 
+                    facet_wrap('groupby1') + 
                     scale_color_gradientn(
                         limits = c(input$singleLowerBound, input$singleUpperBound),
                         colours = c(
@@ -325,23 +328,224 @@ shinyServer(function(input, output) {
             plotlyOutput(
                 "singleHeatmapPlotly",
                 height = input$singleHeight,
-                width = input$OverallWidth
+                width = input$singleWidth
             )
         )
     })
     
     
 # PrintDirection ----------------------------------------------------------
+    output$PrintDirBoardChoice <- renderUI(pickerInput(inputId = "PrintDirBoards",label = "Select Boards For Combined Direction",choices = boardList(),selected = boardList(),multiple = TRUE,options = list(`actions-box` = TRUE,size = 10,`selected-text-format` = "count > 3")))
+    
+    
     output$PrintDirGrouping <-renderUI(selectInput(inputId = "PrintDirGroupingInput",label = "Select Grouping",choices = zVariableList(),selected = "PadID"))
     output$PrintDirXOutput <-renderUI(selectInput(inputId = "PrintDirXInput",label = "Select X Choice",choices = xyVariableList,selected = "PosX(mm)"))
     output$PrintDirYOutput <-renderUI(selectInput(inputId = "PrintDirYInput",label = "Select Y Choice",choices = xyVariableList,selected = "PosY(mm)"))
     output$PrintDirZOutput <-renderUI(selectInput(inputId = "PrintDirZInput",label = "Select Z Choice",choices = zVariableList(),selected = "VolumePerc"))
 
+   printDirData <- reactive({
+        
+        Result <- MainData() %>% filter(BoardNo %in% input$PrintDirBoards)
+        Result$OldBoardNo <- Result$BoardNo
+        Result$BoardNo = (Result$OldBoardNo - (min(Result$OldBoardNo)-1))
+        #Result$CleanPeriod = ceiling(Result$BoardNo/input$CleanPerAmount)
+       # Result$BoardInCP = Result$BoardNo - ((Result$CleanPeriod-1)*input$CleanPerAmount)
+        Result$groupby1 <- Result[['PrintDir']]
+        Result$groupby2 <- Result[[input$PrintDirGroupingInput]]
+        return(Result)
+    })
+    
+    PrintDirHeatmapData <- reactive({
+        if     (input$PrintDirMetric=="Mean"){Result <- printDirData()  %>% group_by(groupby1,groupby2)   %>% dplyr::summarise("Metric" = round(mean(get(input$PrintDirZInput)),3),"PosX(mm)" = round(mean(`PosX(mm)`), 7),"PosY(mm)" = round(mean(`PosY(mm)`), 7))}
+        else if(input$PrintDirMetric=="Median"){Result <- printDirData() %>%  group_by(BoardNo,get(input$PrintDirGroupingInput))   %>% dplyr::summarise("Metric" = round(median(get(input$PrintDirZInput)),3),"PosX(mm)" = round(mean(`PosX(mm)`), 7),"PosY(mm)" = round(mean(`PosY(mm)`), 7))}
+        else if(input$PrintDirMetric=="Min"){Result <- printDirData() %>% group_by(BoardNo,get(input$PrintDirGroupingInput))      %>% dplyr::summarise("Metric" = round(min(get(input$PrintDirZInput)),3),"PosX(mm)" = round(mean(`PosX(mm)`), 7),"PosY(mm)" = round(mean(`PosY(mm)`), 7))}
+        else if(input$PrintDirMetric=="Max"){Result <- printDirData() %>% group_by(get(input$PrintDirGroupingInput))      %>% dplyr::summarise("Metric" = round(max(get(input$PrintDirZInput)),3),"PosX(mm)" = round(mean(`PosX(mm)`), 7),"PosY(mm)" = round(mean(`PosY(mm)`), 7))}
+        else if(input$PrintDirMetric=="IQR"){Result <- printDirData() %>% group_by(get(input$PrintDirGroupingInput))      %>% dplyr::summarise("Metric" = round(IQR(get(input$PrintDirZInput)),3),"PosX(mm)" = round(mean(`PosX(mm)`), 7),"PosY(mm)" = round(mean(`PosY(mm)`), 7))}
+        else if(input$PrintDirMetric=="StdDev"){Result <- printDirData() %>% group_by(get(input$PrintDirGroupingInput))   %>% dplyr::summarise("Metric" = round(sd(get(input$PrintDirZInput)),3),"PosX(mm)" = round(mean(`PosX(mm)`), 7),"PosY(mm)" = round(mean(`PosY(mm)`), 7))}
+        else if(input$PrintDirMetric=="Variance"){Result <- printDirData() %>% group_by(get(input$PrintDirGroupingInput)) %>% dplyr::summarise("Metric" = round(var(get(input$PrintDirZInput)),3),"PosX(mm)" = round(mean(`PosX(mm)`), 7),"PosY(mm)" = round(mean(`PosY(mm)`), 7))}
+        else if(input$PrintDirMetric=="Mad"){Result <- printDirData() %>% group_by(get(input$PrintDirGroupingInput))      %>% dplyr::summarise("Metric" = round(mad(get(input$PrintDirZInput)),3),"PosX(mm)" = round(mean(`PosX(mm)`), 7),"PosY(mm)" = round(mean(`PosY(mm)`), 7))}
+        else (Result <- printDirData() %>% group_by(get(input$PrintDirGroupingInput)) %>% dplyr::summarise("Metric" = round(mean(get(input$PrintDirZInput)),3),"PosX(mm)" = round(mean(`PosX(mm)`), 7),"PosY(mm)" = round(mean(`PosY(mm)`), 7)))                                  
+    }) 
+    
+    output$PrintDirHeatmapDT <- renderDT(PrintDirHeatmapData())
+    output$PrintDirHeatmapPlotly <- renderPlotly({
+        input$PrintDirActionButton
+        isolate(
+            ggplotly(
+                ggplot(
+                    data = PrintDirHeatmapData(),
+                    mapping = aes(
+                        x = get(input$PrintDirXInput),
+                        y = get(input$PrintDirYInput)
+                    )
+                ) +
+                    geom_point(aes(color = Metric)) +
+                    facet_wrap('groupby1') + 
+                    scale_color_gradientn(
+                        limits = c(input$PrintDirLowerBound, input$PrintDirUpperBound),
+                        colours = c(
+                            input$PrintDirColourLower1,
+                            input$PrintDirColourLower2,
+                            input$PrintDirColourAverage,
+                            input$PrintDirColourUpper2,
+                            input$PrintDirColourUpper1
+                        )
+                    )
+            ))
+    })
+    output$PrintDirHeatmapUI <- renderUI({
+        input$PrintDirActionButton
+        isolate(
+            plotlyOutput(
+                "PrintDirHeatmapPlotly",
+                height = input$PrintDirHeight,
+                width = input$PrintDirWidth
+            )
+        )
+    })
 # CleanPeriods ------------------------------------------------------------
+    output$CleanPerBoardChoice <- renderUI(pickerInput(inputId = "CleanPerBoards",label = "Select Boards For Combined Clean Periods",choices = boardList(),selected = boardList(),multiple = TRUE,options = list(`actions-box` = TRUE,size = 10,`selected-text-format` = "count > 3")))
     output$CleanPerGrouping <-renderUI(selectInput(inputId = "CleanPerGroupingInput",label = "Select Grouping",choices = zVariableList(),selected = "PadID"))
     output$CleanPerXOutput <-renderUI(selectInput(inputId = "CleanPerXInput",label = "Select X Choice",choices = xyVariableList,selected = "PosX(mm)"))
     output$CleanPerYOutput <-renderUI(selectInput(inputId = "CleanPerYInput",label = "Select Y Choice",choices = xyVariableList,selected = "PosY(mm)"))
     output$CleanPerZOutput <-renderUI(selectInput(inputId = "CleanPerZInput",label = "Select Z Choice",choices = zVariableList(),selected = "VolumePerc"))
+    
+    cleanPerData <- reactive({
+        
+        Result <- MainData() %>% filter(BoardNo %in% input$CleanPerBoards)
+        Result$OldBoardNo <- Result$BoardNo
+        Result$BoardNo = (Result$OldBoardNo - (min(Result$OldBoardNo)-1))
+        Result$CleanPeriod = ceiling(Result$BoardNo/input$CleanPerAmount)
+        # Result$BoardInCP = Result$BoardNo - ((Result$CleanPeriod-1)*input$CleanPerAmount)
+        Result$groupby1 <- Result[['CleanPeriod']]
+        Result$groupby2 <- Result[[input$CleanPerGroupingInput]]
+        return(Result)
+    })
+    
+    CleanPerHeatmapData <- reactive({
+        if     (input$CleanPerMetric=="Mean"){Result <- cleanPerData()  %>% group_by(groupby1,groupby2)   %>% dplyr::summarise("Metric" = round(mean(get(input$CleanPerZInput)),3),"PosX(mm)" = round(mean(`PosX(mm)`), 7),"PosY(mm)" = round(mean(`PosY(mm)`), 7))}
+        else if(input$CleanPerMetric=="Median"){Result <- cleanPerData() %>%  group_by(BoardNo,get(input$CleanPerGroupingInput))   %>% dplyr::summarise("Metric" = round(median(get(input$CleanPerZInput)),3),"PosX(mm)" = round(mean(`PosX(mm)`), 7),"PosY(mm)" = round(mean(`PosY(mm)`), 7))}
+        else if(input$CleanPerMetric=="Min"){Result <- cleanPerData() %>% group_by(BoardNo,get(input$CleanPerGroupingInput))      %>% dplyr::summarise("Metric" = round(min(get(input$CleanPerZInput)),3),"PosX(mm)" = round(mean(`PosX(mm)`), 7),"PosY(mm)" = round(mean(`PosY(mm)`), 7))}
+        else if(input$CleanPerMetric=="Max"){Result <- cleanPerData() %>% group_by(get(input$CleanPerGroupingInput))      %>% dplyr::summarise("Metric" = round(max(get(input$CleanPerZInput)),3),"PosX(mm)" = round(mean(`PosX(mm)`), 7),"PosY(mm)" = round(mean(`PosY(mm)`), 7))}
+        else if(input$CleanPerMetric=="IQR"){Result <- cleanPerData() %>% group_by(get(input$CleanPerGroupingInput))      %>% dplyr::summarise("Metric" = round(IQR(get(input$CleanPerZInput)),3),"PosX(mm)" = round(mean(`PosX(mm)`), 7),"PosY(mm)" = round(mean(`PosY(mm)`), 7))}
+        else if(input$CleanPerMetric=="StdDev"){Result <- cleanPerData() %>% group_by(get(input$CleanPerGroupingInput))   %>% dplyr::summarise("Metric" = round(sd(get(input$CleanPerZInput)),3),"PosX(mm)" = round(mean(`PosX(mm)`), 7),"PosY(mm)" = round(mean(`PosY(mm)`), 7))}
+        else if(input$CleanPerMetric=="Variance"){Result <- cleanPerData() %>% group_by(get(input$CleanPerGroupingInput)) %>% dplyr::summarise("Metric" = round(var(get(input$CleanPerZInput)),3),"PosX(mm)" = round(mean(`PosX(mm)`), 7),"PosY(mm)" = round(mean(`PosY(mm)`), 7))}
+        else if(input$CleanPerMetric=="Mad"){Result <- cleanPerData() %>% group_by(get(input$CleanPerGroupingInput))      %>% dplyr::summarise("Metric" = round(mad(get(input$CleanPerZInput)),3),"PosX(mm)" = round(mean(`PosX(mm)`), 7),"PosY(mm)" = round(mean(`PosY(mm)`), 7))}
+        else (Result <- cleanPerData() %>% group_by(get(input$CleanPerGroupingInput)) %>% dplyr::summarise("Metric" = round(mean(get(input$CleanPerZInput)),3),"PosX(mm)" = round(mean(`PosX(mm)`), 7),"PosY(mm)" = round(mean(`PosY(mm)`), 7)))                                  
+    }) 
+    
+    output$CleanPerHeatmapDT <- renderDT(CleanPerHeatmapData())
+    output$CleanPerHeatmapPlotly <- renderPlotly({
+        input$CleanPerActionButton
+        isolate(
+            ggplotly(
+                ggplot(
+                    data = CleanPerHeatmapData(),
+                    mapping = aes(
+                        x = get(input$CleanPerXInput),
+                        y = get(input$CleanPerYInput)
+                    )
+                ) +
+                    geom_point(aes(color = Metric)) +
+                    facet_wrap('groupby1') + 
+                    scale_color_gradientn(
+                        limits = c(input$CleanPerLowerBound, input$CleanPerUpperBound),
+                        colours = c(
+                            input$CleanPerColourLower1,
+                            input$CleanPerColourLower2,
+                            input$CleanPerColourAverage,
+                            input$CleanPerColourUpper2,
+                            input$CleanPerColourUpper1
+                        )
+                    )
+            ))
+    })
+    output$CleanPerHeatmapUI <- renderUI({
+        input$CleanPerActionButton
+        isolate(
+            plotlyOutput(
+                "CleanPerHeatmapPlotly",
+                height = input$CleanPerHeight,
+                width = input$CleanPerWidth
+            )
+        )
+    })
+    
+    
+    # Donkey ------------------------------------------------------------
+    output$DonkeyBoardChoice <- renderUI(pickerInput(inputId = "DonkeyBoards",label = "Select Boards For Combined Clean Periods",choices = boardList(),selected = boardList(),multiple = TRUE,options = list(`actions-box` = TRUE,size = 10,`selected-text-format` = "count > 3")))
+    output$DonkeyGrouping <-renderUI(selectInput(inputId = "DonkeyGroupingInput",label = "Select Grouping",choices = zVariableList(),selected = "BoardNo"))
+    output$DonkeyGrouping2 <-renderUI(selectInput(inputId = "DonkeyGroupingInput2",label = "Select Grouping",choices = zVariableList(),selected = "Package"))
+    output$DonkeyXOutput <-renderUI(selectInput(inputId = "DonkeyXInput",label = "Select X Choice",choices = xyVariableList,selected = "PosX(mm)"))
+    output$DonkeyYOutput <-renderUI(selectInput(inputId = "DonkeyYInput",label = "Select Y Choice",choices = xyVariableList,selected = "PosY(mm)"))
+    output$DonkeyZOutput <-renderUI(selectInput(inputId = "DonkeyZInput",label = "Select Z Choice",choices = zVariableList(),selected = "VolumePerc"))
+    
+    donkeyData <- reactive({
+        
+        Result <- MainData() %>% filter(BoardNo %in% input$DonkeyBoards)
+        Result$OldBoardNo <- Result$BoardNo
+        Result$BoardNo = (Result$OldBoardNo - (min(Result$OldBoardNo)-1))
+        
+        Result$groupby1 <- Result[[input$DonkeyGroupingInput]]
+        Result$groupby2 <- Result[[input$DonkeyGroupingInput2]]
+        return(Result)
+    })
+    
+    DonkeyHeatmapData <- reactive({
+        Result <- donkeyData()  %>% 
+            group_by(groupby1,groupby2) %>% 
+            dplyr::summarise(
+            "PosX(mm)" = round(mean(`PosX(mm)`), 7),
+            "PosY(mm)" = round(mean(`PosY(mm)`), 7),
+            "Mean" = round(mean(get(input$DonkeyZInput)),3),
+            "Median" = round(median(get(input$DonkeyZInput)),3),
+            "Min" = round(min(get(input$DonkeyZInput)),3),
+            "Max" = round(max(get(input$DonkeyZInput)),3),
+            "IQR" = round(IQR(get(input$DonkeyZInput)),3),
+            "StdDev" = round(sd(get(input$DonkeyZInput)),3),
+            "Variance" = round(var(get(input$DonkeyZInput)),3),
+            "Median Variance" = round(mad(get(input$DonkeyZInput)),3)
+        )
+        return(Result)
+    }) 
+    
+    output$DonkeyHeatmapDT <- renderDT(DonkeyHeatmapData())
+    output$DonkeyHeatmapPlotly <- renderPlotly({
+        input$DonkeyActionButton
+        isolate(
+            ggplotly(
+                ggplot(
+                    data = DonkeyHeatmapData(),
+                    mapping = aes(
+                        x = get(input$DonkeyXInput),
+                        y = get(input$DonkeyYInput)
+                    )
+                ) 
+                + labs(x = as.character(input$DonkeyXInput),y = as.character(input$DonkeyYInput), title = paste0("This is the Donkey Title","     Test Input ---",input$DonkeyMetric))
+                + geom_point(aes(color = get(input$DonkeyMetric))) +
+                    facet_wrap('groupby1') + 
+                    scale_color_gradientn(
+                        limits = c(input$DonkeyLowerBound, input$DonkeyUpperBound),
+                        colours = c(
+                            input$DonkeyColourLower1,
+                            input$DonkeyColourLower2,
+                            input$DonkeyColourAverage,
+                            input$DonkeyColourUpper2,
+                            input$DonkeyColourUpper1
+                        )
+                    )
+            ))
+    })
+    output$DonkeyHeatmapUI <- renderUI({
+        input$DonkeyActionButton
+        isolate(
+            plotlyOutput(
+                "DonkeyHeatmapPlotly",
+                height = input$DonkeyHeight,
+                width = input$DonkeyWidth
+            )
+        )
+    })
     
     
     

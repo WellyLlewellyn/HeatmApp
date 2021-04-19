@@ -52,8 +52,23 @@ data_frame("A" = c(0,0,0,0,1,0,6) ,"B" = c(0,0,0,1,0,5,0), "C" = c(0,0,1,0,4,0,1
 
 ```{r}
 Lens1GroupSubset <- Lens1 %>% filter(Package %in% list(4,5,6))
-Lens1GrpSubCompSumm <- Lens1GroupSubset%>%group_by(Location,BoardNo)%>%
+Lens1GroupSubset$groupby1 <- Lens1GroupSubset$PadID
+Lens1GroupSubset$groupby2 <- Lens1GroupSubset$BoardNo
+Lens1GrpSubCompSumm3 <- Lens1GroupSubset%>%group_by(groupby1,groupby2)%>%
     dplyr::summarise("PosX(mm)"=mean(`PosX(mm)`),"PosY(mm)"=mean(`PosY(mm)`),"Package"=mean(Package),count =n())
+
+testingDT <- Lens1GroupSubset  %>% group_by(groupby1,groupby2)   %>% dplyr::summarise(
+            "PosX(mm)" = round(mean(`PosX(mm)`), 7),
+            "PosY(mm)" = round(mean(`PosY(mm)`), 7),
+            "Mean" = round(mean(VolumePerc),3),
+            "Median" = round(median(VolumePerc),3),
+            "Min" = round(min(VolumePerc),3),
+            "Max" = round(max(VolumePerc),3),
+            "IQR" = round(IQR(VolumePerc),3),
+            "StdDev" = round(sd(VolumePerc),3),
+            "Variance" = round(var(VolumePerc),3),
+            "Median Variance" = round(mad(VolumePerc),3)
+        )
 ```
 
 ```{r}
