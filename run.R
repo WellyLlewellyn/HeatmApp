@@ -12,14 +12,12 @@ if(xfun::dir_exists("R")==TRUE){
 
 # Libraries ---------------------------------------------------------------
 
-library(shinydashboardPlus)
-library(shinydashboard)
 library(tidyverse)
 library(shiny)
 library(DT)
 library(plotly)
-
-
+library(shinydashboard)
+library(shinydashboardPlus)
 
 
 # Run App ---------------------------------------------------------------
