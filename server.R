@@ -1,3 +1,12 @@
+# Libraries ---------------------------------------------------------------
+sourceDirectory()
+library(shiny)
+library(shinydashboard)
+library(shinydashboardPlus)
+library(shinyWidgets)
+library(tidyverse)
+library(DT)
+
 # Server Logic ------------------------------------------------------------
 
 shinyServer(function(input, output) {

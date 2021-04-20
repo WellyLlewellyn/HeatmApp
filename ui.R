@@ -35,8 +35,8 @@ options(
 )
 
 # UI Code -----------------------------------------------------------------
-ui <- dashboardPagePlus(skin = "green",
-                            dashboardHeaderPlus(disable = FALSE),
+ui <- shinydashboardPlus::dashboardPage(skin = "green",
+                            dashboardHeader(disable = FALSE),
                         dashboardSidebar(disable = TRUE,  
                                          sidebarMenu(
                                              menuItem(text = "FileImport",tabName = "Load",icon = icon("file-csv"),selected = TRUE),
